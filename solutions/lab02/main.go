@@ -43,7 +43,7 @@ func taskHandler(w http.ResponseWriter, req *http.Request) {
 		re.ID = i
 	}
         tasks[i] = re
-        result = tasks[re.ID]
+        result = tasks[i]
         encoder := json.NewEncoder(w)
         encoder.Encode(&result)
     }

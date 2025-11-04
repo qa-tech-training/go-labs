@@ -31,12 +31,14 @@ We will need to make some changes to this file, starting with the imports. Since
 import (
     "encoding/json"
     "net/http"
+    "fmt"
     "log"
     "errors"
     "io"
+    "github.com/google/uuid"
 )
 ```
-Note that we are no longer importing the fmt library - we will not need it for the web app. Next, add the following between the import block and the main function:
+Next, add the following between the import block and the main function:
 ```go
 type task struct {
     Completed bool `json:"completed"`
@@ -65,8 +67,13 @@ func taskHandler(w http.ResponseWriter, req *http.Request) {
         encoder.Encode(tasks)
     }
     if req.Method == "POST" || req.Method == "PUT" {
-        tasks[re.ID] = re
-        result = tasks[re.ID]
+        i := re.ID
+        if i == "" {
+                i = fmt.Sprintf("%s", uuid.New())
+                re.ID = i
+        }
+        tasks[i] = re
+        result = tasks[i]
         encoder := json.NewEncoder(w)
         encoder.Encode(&result)
     }
@@ -85,17 +92,21 @@ func main() {
 This registers the function containing our application logic as a handler for requests to the _/calc_ endpoint, before starting the server with logging enabled.
 
 ### Build and Run the Application
-Compile the code using go build:
+Before compiling, we will need to instal the uuid library being used to programmatically generate IDs:
+```bash
+go get -u github.com/google/uuid
+```
+Then compile the code using go build:
 ```bash
 go build -o bin/webapp
 ```
-then make the binary executable, and run it:
+and run the binary:
 ```bash
-chmod +x bin/webapp
 ./bin/webapp
 ```
 Once the app is running, in a new terminal session use curl to test the functionality of the app:
 ```bash
+cd ~/go-labs/lab02 # ensure we're in the right place
 curl -XPOST -d@request.json http://localhost:8080/tasks
 curl -XGET http://localhost:8080/tasks
 # edit request.json, setting 'Completed' to true
@@ -107,7 +118,7 @@ curl -XGET http://localhost:8080/tasks
 In the original terminal, stop the app with ctrl+c
 
 ### Add a Basic Unit Test
-We will now add a basic unit test for our app. For this, we will need to use an external library to _mock_ the response from the app. Run the following:
+We will now add a basic unit test for our app. For this, we will need to use another external library, gock, to _mock_ the response from the app:
 ```bash
 go get -u github.com/h2non/gock
 ```
