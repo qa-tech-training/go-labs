@@ -1,0 +1,8 @@
+provider_installation {
+    dev_overrides {
+    "simple1" = "~/provider_test"
+  }
+  direct {
+    exclude = ["registry.terraform.io/*/*"]
+  }
+}
