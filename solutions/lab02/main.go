@@ -37,18 +37,18 @@ func taskHandler(w http.ResponseWriter, req *http.Request) {
         encoder.Encode(tasks)
     }
     if req.Method == "POST" || req.Method == "PUT" {
-	i := re.ID
-	if i == "" {
-		i = fmt.Sprintf("%s", uuid.New()) 
-		re.ID = i
-	}
+	    i := re.ID
+	    if i == "" {
+		    i = fmt.Sprintf("%s", uuid.New()) 
+		    re.ID = i
+	    }
         tasks[i] = re
         result = tasks[i]
         encoder := json.NewEncoder(w)
         encoder.Encode(&result)
     }
     if req.Method == "DELETE" {
-	delete(tasks, re.ID)
+	    delete(tasks, re.ID)
     }
 }
 
